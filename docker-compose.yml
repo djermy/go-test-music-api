@@ -1,0 +1,20 @@
+---
+version: "3.1"
+
+services:
+  music-postgres:
+    image: bitnami/postgresql:14
+    container_name: music-postgres
+    restart: always
+    network_mode: host
+    environment:
+      POSTGRESQL_USER: postgres
+      POSTGRESQL_DATABASE: music
+      POSTGRESQL_PASSWORD: password
+      ALLOW_EMPTY_PASSWORD: yes
+      ALLOW_IP: 0.0.0.0/0
+    volumes:
+      - music_postgres:/bitnami/postgresql
+
+volumes:
+  music_postgres:
