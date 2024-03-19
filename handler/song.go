@@ -1,27 +1,22 @@
-package main
+package handler
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
+	"log"
 	"net/http"
 
 	"example.com/music-api/model"
+	"example.com/music-api/store"
 	"github.com/gorilla/mux"
 )
 
-func initHandlersMusic() {
-	router.HandleFunc("/song", getSongs).Methods("GET")
-	router.HandleFunc("/song", createSong).Methods("POST")
-	router.HandleFunc("/song/{songid}", getSongByID).Methods("GET")
-	router.HandleFunc("/song/{songid}", updateSongByID).Methods("PUT")
-	router.HandleFunc("/song/{songid}", deleteSongByID).Methods("DELETE")
-}
-
 func getSongs(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	err := writeJSON(w, GetSongs())
+	songs, _ := store.GetSongs()
+	err := writeJSON(w, songs)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 }
@@ -29,21 +24,24 @@ func getSongs(w http.ResponseWriter, r *http.Request) {
 func getSongByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	id, ok := mux.Vars(r)["id"]
+	id, ok := mux.Vars(r)["songid"]
 	if !ok {
-		fmt.Println("id is missing in parameters")
+		err := errors.New("id is missing in parameters")
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	targetSong, err := GetSong(id)
+	targetSong, err := store.GetSong(id)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = writeJSON(w, targetSong)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 }
@@ -55,19 +53,32 @@ func createSong(w http.ResponseWriter, r *http.Request) {
 
 	err := readJSON(w, r, &newSong)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
-	CreateSong(newSong)
+	err = store.CreateSong(&newSong)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = writeJSON(w, &newSong)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 }
 
 func updateSongByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	id, ok := mux.Vars(r)["id"]
+	id, ok := mux.Vars(r)["songid"]
 	if !ok {
-		fmt.Println("id is missing in parameters")
+		err := errors.New("id is missing in parameters")
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -75,25 +86,33 @@ func updateSongByID(w http.ResponseWriter, r *http.Request) {
 
 	err := readJSON(w, r, &updatedSong)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
-	UpdateSong(id, updatedSong)
+	err = store.UpdateSong(id, &updatedSong)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func deleteSongByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	id, ok := mux.Vars(r)["id"]
+	id, ok := mux.Vars(r)["songid"]
 	if !ok {
-		fmt.Println("id is missing in parameters")
+		err := errors.New("id is missing in parameters")
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err := DeleteSong(id)
+	err := store.DeleteSong(id)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
