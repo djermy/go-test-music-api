@@ -11,6 +11,7 @@ import (
 type Handler struct {
 	store  store.Store
 	Router *mux.Router
+	V1     *mux.Router
 }
 
 func New(store store.Store) *Handler {
@@ -18,11 +19,18 @@ func New(store store.Store) *Handler {
 		store: store,
 	}
 
+	// initialise routers
 	h.Router = mux.NewRouter()
+	h.V1 = h.Router.PathPrefix("/").Subrouter()
 
-	h.Router.Use(ContentTypeJson)
+	// middleware
+	h.V1.Use(ContentTypeJson)
 
+	// initialise handlers
 	h.handleSong()
+
+	// serve static files
+	h.Router.Handle("/", http.FileServer(http.Dir("./static")))
 
 	return h
 }

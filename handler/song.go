@@ -11,11 +11,11 @@ import (
 )
 
 func (h *Handler) handleSong() {
-	h.Router.HandleFunc("/song", h.handleGetSongs).Methods("GET")
-	h.Router.HandleFunc("/song", h.handleCreateSong).Methods("POST")
-	h.Router.HandleFunc("/song/{songid}", h.handleGetSongByID).Methods("GET")
-	h.Router.HandleFunc("/song/{songid}", h.handleUpdateSongByID).Methods("PUT")
-	h.Router.HandleFunc("/song/{songid}", h.handleDeleteSongByID).Methods("DELETE")
+	h.V1.HandleFunc("/song", h.handleGetSongs).Methods("GET")
+	h.V1.HandleFunc("/song", h.handleCreateSong).Methods("POST")
+	h.V1.HandleFunc("/song/{songid}", h.handleGetSongByID).Methods("GET")
+	h.V1.HandleFunc("/song/{songid}", h.handleUpdateSongByID).Methods("PUT")
+	h.V1.HandleFunc("/song/{songid}", h.handleDeleteSongByID).Methods("DELETE")
 }
 
 func (h *Handler) handleGetSongs(w http.ResponseWriter, r *http.Request) {
