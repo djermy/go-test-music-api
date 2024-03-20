@@ -15,7 +15,9 @@ var migrations = []Migration{
 				genre VARCHAR NOT NULL, 
 				created_at TIMESTAMP NOT NULL 
 			);`,
-		Down: `ALTER TABLE song DROP COLUMN IF EXISTS created_at;
-			`,
+		Down: `DROP TABLE IF EXISTS song;`,
+	},
+	{
+		Up: `ALTER TABLE song DROP COLUMN IF EXISTS created_at;`,
 	},
 }
