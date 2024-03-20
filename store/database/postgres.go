@@ -42,23 +42,3 @@ func migrate(conn *pgx.Conn) error {
 	}
 	return nil
 }
-
-/*
-	commandTag, err := conn.Exec(context.Background(), "delete from widgets where id=$1", 42)
-	if err != nil {
-		return err
-	}
-	if commandTag.RowsAffected() != 1 {
-		return errors.New("No row found to delete")
-	}
-
-	var name string
-	var weight int64
-	err = conn.QueryRow(context.Background(), "select name, weight from widgets where id=$1", 42).Scan(&name, &weight)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Println(name, weight)
-*/

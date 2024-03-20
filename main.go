@@ -5,12 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	"example.com/music-api/database"
 	"example.com/music-api/handler"
-	"github.com/jackc/pgx/v5"
+	"example.com/music-api/store"
+	"example.com/music-api/store/database"
 )
-
-var Conn *pgx.Conn
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Llongfile)
@@ -20,7 +18,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer Conn.Close(context.Background())
+	defer store.Conn.Close(context.Background())
 
 	handler.InitHandlersMusic()
 	http.Handle("/", handler.Router)
