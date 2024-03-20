@@ -1,20 +1,16 @@
-package store
+package psqlstore
 
 import (
 	"context"
 	"log"
 
 	"example.com/music-api/model"
-	"github.com/jackc/pgx/v5"
 )
 
-var Conn *pgx.Conn
-
-func GetSongs() ([]model.Song, error) {
+func (s *PsqlStore) GetSongs() ([]model.Song, error) {
 	var songs []model.Song
-	// append to slice - songs = append(songs, song)
 
-	rows, err := Conn.Query(
+	rows, err := s.Conn.Query(
 		context.Background(),
 		`
 		SELECT
@@ -53,9 +49,9 @@ func GetSongs() ([]model.Song, error) {
 	return songs, err
 }
 
-func GetSong(id string) (model.Song, error) {
+func (s *PsqlStore) GetSong(id string) (model.Song, error) {
 	var song model.Song
-	rows, err := Conn.Query(
+	rows, err := s.Conn.Query(
 		context.Background(),
 		`
 		SELECT
@@ -96,8 +92,8 @@ func GetSong(id string) (model.Song, error) {
 	return song, nil
 }
 
-func CreateSong(song *model.Song) error {
-	err := Conn.QueryRow(
+func (s *PsqlStore) CreateSong(song *model.Song) error {
+	err := s.Conn.QueryRow(
 		context.Background(),
 		`
 		INSERT INTO song (
@@ -126,8 +122,8 @@ func CreateSong(song *model.Song) error {
 	return nil
 }
 
-func UpdateSong(id string, song *model.Song) error {
-	rows, err := Conn.Query(
+func (s *PsqlStore) UpdateSong(id string, song *model.Song) error {
+	rows, err := s.Conn.Query(
 		context.Background(),
 		`
 		UPDATE song
@@ -154,8 +150,8 @@ func UpdateSong(id string, song *model.Song) error {
 	return nil
 }
 
-func DeleteSong(id string) error {
-	rows, err := Conn.Query(
+func (s *PsqlStore) DeleteSong(id string) error {
+	rows, err := s.Conn.Query(
 		context.Background(),
 		`
 		DELETE FROM song

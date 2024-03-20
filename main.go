@@ -1,27 +1,20 @@
 package main
 
 import (
-	"context"
 	"log"
-	"net/http"
 
 	"example.com/music-api/handler"
-	"example.com/music-api/store"
-	"example.com/music-api/store/database"
+	"example.com/music-api/store/psqlstore"
 )
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 
-	var err error
-	Conn, err = database.InitDB()
+	s, err := psqlstore.New()
 	if err != nil {
 		panic(err)
 	}
-	defer store.Conn.Close(context.Background())
 
-	handler.InitHandlersMusic()
-	http.Handle("/", handler.Router)
-	log.Println("Server starting on :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	h := handler.New(s)
+	log.Fatal(h.Run())
 }

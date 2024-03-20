@@ -7,13 +7,20 @@ import (
 	"net/http"
 
 	"example.com/music-api/model"
-	"example.com/music-api/store"
 	"github.com/gorilla/mux"
 )
 
-func getSongs(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleSong() {
+	h.Router.HandleFunc("/song", h.handleGetSongs).Methods("GET")
+	h.Router.HandleFunc("/song", h.handleCreateSong).Methods("POST")
+	h.Router.HandleFunc("/song/{songid}", h.handleGetSongByID).Methods("GET")
+	h.Router.HandleFunc("/song/{songid}", h.handleUpdateSongByID).Methods("PUT")
+	h.Router.HandleFunc("/song/{songid}", h.handleDeleteSongByID).Methods("DELETE")
+}
+
+func (h *Handler) handleGetSongs(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	songs, _ := store.GetSongs()
+	songs, _ := h.store.GetSongs()
 	err := writeJSON(w, songs)
 	if err != nil {
 		log.Println(err)
@@ -21,7 +28,7 @@ func getSongs(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getSongByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleGetSongByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	id, ok := mux.Vars(r)["songid"]
@@ -32,7 +39,7 @@ func getSongByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	targetSong, err := store.GetSong(id)
+	targetSong, err := h.store.GetSong(id)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -46,7 +53,7 @@ func getSongByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func createSong(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleCreateSong(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var newSong model.Song
@@ -57,7 +64,7 @@ func createSong(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = store.CreateSong(&newSong)
+	err = h.store.CreateSong(&newSong)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -71,7 +78,7 @@ func createSong(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func updateSongByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleUpdateSongByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	id, ok := mux.Vars(r)["songid"]
@@ -90,7 +97,7 @@ func updateSongByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = store.UpdateSong(id, &updatedSong)
+	err = h.store.UpdateSong(id, &updatedSong)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -98,7 +105,7 @@ func updateSongByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func deleteSongByID(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleDeleteSongByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	id, ok := mux.Vars(r)["songid"]
@@ -109,7 +116,7 @@ func deleteSongByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := store.DeleteSong(id)
+	err := h.store.DeleteSong(id)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
