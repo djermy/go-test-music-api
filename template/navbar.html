@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Bangers&Mash Website</title>
-        <link rel="stylesheet" href="/css/styles.css" />
+        <link rel="stylesheet" href="styles.css" />
         <script src="https://kit.fontawesome.com/fab302bd26.js" crossorigin="anonymous"></script>
     </head>
     <body>
@@ -35,47 +35,5 @@
                 </ul>
             </div>
         </nav>
-        <h1>Songs</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Album</th>
-                    <th>Genre</th>
-                </tr>
-            </thead>
-            <tbody id="songs"></tbody>
-        </table>
-
-        <script lang="javascript">
-            const appendRow = (song) => {
-                const dataPoints = []
-                Object.keys(song).forEach((key) => {
-                    const data = document.createElement("td")
-                    data.innerHTML = song[key]
-                    dataPoints.push(data)
-                })
-
-                const row = document.createElement("tr") 
-                dataPoints.forEach((data) => {
-                    row.appendChild(data)
-                })
-                
-                const tbody = document.getElementById("songs")
-                tbody.appendChild(row)
-            }
-
-            const getSongs = async () => {
-                const res = await fetch("/song")
-                const songs = await res.json()
-                console.log(songs)
-                songs.forEach((song) => {
-                    appendRow(song)
-                })
-            }
-            getSongs()
-        </script>
     </body>
 </html>
